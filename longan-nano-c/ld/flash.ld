@@ -4,15 +4,19 @@ MEMORY
 	RAM (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
+ENTRY(_start)
+
 SECTIONS
 {
 	.text : {
 		*(.init);
 		*(.text);
+		*(.text.*);
 	} >FLASH AT>FLASH
 
 	.rodata : {
 		*(.rodata);
+		*(.rodata.*);
 	} >FLASH AT>FLASH
 
 	.lalign : {
@@ -25,7 +29,9 @@ SECTIONS
 
 	.data : {
 		*(.data);
+		*(.data.*);
 		*(.sdata);
+		*(.sdata.*);
 		_edata = .;
 	} >RAM AT>FLASH
 

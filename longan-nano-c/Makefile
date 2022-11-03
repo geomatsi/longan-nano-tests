@@ -10,29 +10,39 @@ CC = $(CROSS_COMPILE)gcc
 AS = $(CROSS_COMPILE)as
 LD = $(CROSS_COMPILE)ld
 
-CCFLAGS = -Wall -Wextra -Werror -std=c11 -ffreestanding -nostdlib -march=rv32g
-ASFLAGS =
-LDFLAGS = --nostdlib
+OPTS = -DHXTAL_VALUE=8000000U
 
-CCFLAGS += -DHXTAL_VALUE=8000000U \
-	 -Iinclude \
+ASFLAGS = -march=rv32g
+CCFLAGS = -march=rv32g -std=c11 -ffunction-sections -fdata-sections -ffreestanding -Wall -Wextra -Werror
+LDFLAGS = -nostdlib --gc-sections --fatal-warnings
+
+CCFLAGS += -Iinclude \
 	 -I$(GD32VF103_BSP)/Firmware/GD32VF103_standard_peripheral/Include \
 	 -I$(GD32VF103_BSP)/Firmware/GD32VF103_standard_peripheral \
 	 -I$(GD32VF103_BSP)/Template
 
+VPATH += src
 VPATH += $(GD32VF103_BSP)/Firmware/GD32VF103_standard_peripheral/Source
 
-all: firmware-noirq
+# firmware-noirq files
 
-firmware-noirq: ld/flash.ld start-noirq.o main-noirq.o gd32vf103_usart.o gd32vf103_rcu.o gd32vf103_gpio.o
-	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $@.elf
+FW_NOIRQ_SRCS := start-noirq.c main-noirq.c gd32vf103_usart.c gd32vf103_rcu.c gd32vf103_gpio.c
+FW_NOIRQ_OBJS := $(FW_NOIRQ_SRCS:.c=.o)
+FW_NOIRQ_LDS := ld/flash.ld
+
+firmware-noirq: $(FW_NOIRQ_LDS) $(FW_NOIRQ_OBJS)
+	$(LD) -T$< $(LDFLAGS) $(filter-out $<, $^) -o $@.elf
 	$(CP) -O binary $@.elf $@.bin
+
+# common
+
+all: firmware-noirq
 
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(OPTS) $(CCFLAGS) -c $< -o $@
 
 clean:
 	rm -rf *.o firmware-*.*
