@@ -1,7 +1,5 @@
 #include "gd32vf103.h"
 
-void entry(void) __attribute__ ((noreturn));
-
 void put_char(int ch)
 {
 	usart_data_transmit(USART0, (uint8_t)ch);
@@ -18,7 +16,8 @@ void delay(unsigned int cycles)
 		__asm__ volatile ("nop");
 	}
 }
-void test(void)
+
+void main(void)
 {
     /* enable clocks */
     rcu_periph_clock_enable(RCU_GPIOA);
@@ -59,13 +58,4 @@ void test(void)
 	    put_char('B');
 	    delay(100000);
     }
-}
-
-void entry(void) {
-
-	test();
-
-	while (1) {
-		__asm__ volatile ("wfi");
-	}
 }

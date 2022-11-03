@@ -42,4 +42,7 @@ _start0800:
 	addi a0, a0, 4
 	bltu a0, a1, 1b
 2:
- 	jal zero, entry
+	call main
+1:
+	wfi
+	j 1b
