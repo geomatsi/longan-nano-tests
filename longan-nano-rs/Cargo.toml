@@ -9,8 +9,10 @@ autotests = false
 autoexamples = false
 
 [dependencies]
+riscv = "0.9.0"
 riscv-rt = "0.9.0"
 panic-halt = "0.2.0"
+gd32vf103xx-hal = "0.5.0"
 embedded-graphics = "0.7.1"
 
 [dependencies.longan-nano]
@@ -32,3 +34,7 @@ path = "src/bin/ball.rs"
 [[example]]
 name = "uart-test1"
 path = "examples/uart-test1.rs"
+
+[[example]]
+name = "irq-test1"
+path = "examples/irq-test1.rs"
