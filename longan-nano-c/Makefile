@@ -13,7 +13,7 @@ LD = $(CROSS_COMPILE)ld
 OPTS = -DHXTAL_VALUE=8000000U
 
 ASFLAGS = -march=rv32g
-CCFLAGS = -march=rv32g -std=c11 -ffunction-sections -fdata-sections -ffreestanding -Wall -Wextra -Werror
+CCFLAGS = -march=rv32g -std=c11 -ffunction-sections -fdata-sections -ffreestanding -Wall -Wextra -Werror -fno-stack-protector
 LDFLAGS = -nostdlib --gc-sections --fatal-warnings
 
 CCFLAGS += -Iinclude \
