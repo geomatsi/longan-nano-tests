@@ -8,7 +8,7 @@ use gd32vf103xx_hal::timer;
 use gd32vf103xx_hal::timer::Timer;
 use longan_nano::led::{rgb, Led, BLUE, GREEN};
 use riscv_rt::entry;
-use riscv::interrupt::Mutex;
+use critical_section::Mutex;
 use core::cell::RefCell;
 use core::ops::DerefMut;
 
@@ -37,10 +37,10 @@ fn main() -> ! {
     let mut timer =  Timer::timer1(dp.TIMER1, 1.hz(), &mut rcu);
     timer.listen(timer::Event::Update);
 
-    riscv::interrupt::free(|cs| {
-        G_TMR.borrow(*cs).replace(Some(timer));
-        G_LED.borrow(*cs).replace(Some(green));
-        B_LED.borrow(*cs).replace(Some(blue));
+    critical_section::with(|cs| {
+        G_TMR.borrow(cs).replace(Some(timer));
+        G_LED.borrow(cs).replace(Some(green));
+        B_LED.borrow(cs).replace(Some(blue));
     });
 
     ECLIC::reset();
@@ -69,17 +69,17 @@ fn main() -> ! {
 #[allow(non_snake_case)]
 #[no_mangle]
 fn TIMER1() {
-    riscv::interrupt::free(|cs| {
-        if let Some(ref mut tim) = G_TMR.borrow(*cs).borrow_mut().deref_mut()
+    critical_section::with(|cs| {
+        if let Some(ref mut tim) = G_TMR.borrow(cs).borrow_mut().deref_mut()
         {
             tim.clear_update_interrupt_flag();
         }
     });
 
-    riscv::interrupt::free(|cs| {
+    critical_section::with(|cs| {
         if let (Some(ref mut g), Some(ref mut b)) = (
-            G_LED.borrow(*cs).borrow_mut().deref_mut(),
-            B_LED.borrow(*cs).borrow_mut().deref_mut(),
+            G_LED.borrow(cs).borrow_mut().deref_mut(),
+            B_LED.borrow(cs).borrow_mut().deref_mut(),
         ) {
             if g.is_on() {
                 g.off();
