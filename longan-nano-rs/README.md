@@ -21,6 +21,17 @@ Flash image using cargo-embed:
 $  cargo embed --bin <binary name> flash
 ```
 
+# Flash using OpenOCD and cargo-make tool
+
+Build and flash release image:
+```bash
+$ cargo make flash_release <binary name>
+```
+Build and flash debug image:
+```bash
+$ cargo make flash_debug <binary name>
+```
+
 ### Debug using OpenOCD
 
 Start OpenOCD using any suitable JTAG probe:
